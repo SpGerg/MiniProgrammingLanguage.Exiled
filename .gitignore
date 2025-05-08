@@ -1,0 +1,12 @@
+# Visual Studio
+/.vs/
+
+# Rider
+riderModule.iml
+/_ReSharper.Caches/
+/.idea/
+
+# Output files
+/build/
+bin/
+obj/
