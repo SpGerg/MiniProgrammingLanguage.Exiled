@@ -17,7 +17,7 @@ public static class PluginType
     {
         return new UserTypeInstanceBuilder()
             .SetName("ex_plugin")
-            .SetModule("exiled-kit")
+            .SetModule(ExiledKitModule.Name)
             .SetAccess(AccessType.Static)
             .AddMember(new TypeVariableMemberInstanceBuilder()
                 .SetParent("ex_plugin")

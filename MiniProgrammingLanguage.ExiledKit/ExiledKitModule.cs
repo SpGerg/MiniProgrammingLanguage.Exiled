@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Exiled.API.Features;
 using Exiled.API.Interfaces;
 using Exiled.Events.EventArgs.Player;
@@ -6,6 +7,7 @@ using MiniProgrammingLanguage.Core.Interpreter;
 using MiniProgrammingLanguage.Core.Interpreter.Repositories.Variables;
 using MiniProgrammingLanguage.Core.Interpreter.Values;
 using MiniProgrammingLanguage.Core.Interpreter.Values.Enums;
+using MiniProgrammingLanguage.Core.Interpreter.Values.Type;
 using MiniProgrammingLanguage.Core.Parser.Ast.Enums;
 using MiniProgrammingLanguage.ExiledKit.Enums.Exiled;
 using MiniProgrammingLanguage.ExiledKit.Functions.Logger;
@@ -17,9 +19,16 @@ namespace MiniProgrammingLanguage.ExiledKit;
 
 public static class ExiledKitModule
 {
+    public const string Name = "exiled-kit";
+    
+    public static List<TypeValue> Players => _players;
+
+    private static readonly List<TypeValue> _players = new();
+
     static ExiledKitModule()
     {
         Exiled.Events.Handlers.Player.Verified += InvokeOnVerified;
+        Exiled.Events.Handlers.Player.Left += InvokeOnLeft;
     }
     
     public static void Include(IPlugin<IConfig> plugin, ProgramContext programContext, Listener onEnabled, Listener onDisabled)
@@ -35,16 +44,9 @@ public static class ExiledKitModule
             Value = pluginValue,
             Root = null
         });
-        
-        programContext.Variables.Add(new UserVariableInstance
-        {
-            Name = "on_verified",
-            Module = "exiled-kit",
-            Access = AccessType.Static | AccessType.ReadOnly,
-            Type = new ObjectTypeValue("listener", ValueType.Type),
-            Value = PlayerListeners.Verified,
-            Root = null
-        });
+
+        AddEventListener(programContext, "on_verified", PlayerListeners.Verified);
+        AddEventListener(programContext, "on_left", PlayerListeners.Left);
         
         programContext.Enums.Add(RoleTypeEnum.Instance);
         programContext.Variables.Add(RoleTypeEnum.VariableInstance);
@@ -59,7 +61,31 @@ public static class ExiledKitModule
     private static void InvokeOnVerified(VerifiedEventArgs ev)
     {
         var player = PlayerType.CreateValue(ev.Player);
+        
+        _players.Add(player);
 
         PlayerListeners.VerifiedListener.Invoke(null, Location.Default, player);
+    }
+    
+    private static void InvokeOnLeft(LeftEventArgs ev)
+    {
+        var player = PlayerType.CreateValue(ev.Player);
+
+        _players.Remove(player);
+
+        PlayerListeners.LeftListener.Invoke(null, Location.Default, player);
+    }
+
+    private static void AddEventListener(ProgramContext programContext, string name, AbstractValue listener)
+    {
+        programContext.Variables.Add(new UserVariableInstance
+        {
+            Name = name,
+            Module = Name,
+            Access = AccessType.Static | AccessType.ReadOnly,
+            Type = new ObjectTypeValue("listener", ValueType.Type),
+            Value = listener,
+            Root = null
+        });
     }
 }

@@ -18,6 +18,7 @@ public static class PlayerType
     {
         return new UserTypeInstanceBuilder()
             .SetName("ex_player")
+            .SetModule(ExiledKitModule.Name)
             .SetAccess(AccessType.Static | AccessType.ReadOnly)
             .AddMember(new TypeLanguageFunctionMemberInstanceBuilder()
                 .SetName("set_role")

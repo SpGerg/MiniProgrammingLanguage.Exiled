@@ -13,7 +13,7 @@ public static class RoleTypeEnum
     public static UserVariableInstance VariableInstance { get; } = new()
     {
         Name = Instance.Name,
-        Module = "exiled-kit",
+        Module = ExiledKitModule.Name,
         Type = new ObjectTypeValue(Instance.Name, ValueType.Enum),
         Access = AccessType.Static | AccessType.ReadOnly,
         Value = Instance.Create(),
@@ -24,6 +24,7 @@ public static class RoleTypeEnum
     {
         return new UserEnumInstanceBuilder()
             .SetName("role_type")
+            .SetModule(ExiledKitModule.Name)
             .SetAccess(AccessType.Static | AccessType.ReadOnly)
             .AddMember("scp_173", 0)
             .AddMember("class_d", 1)
