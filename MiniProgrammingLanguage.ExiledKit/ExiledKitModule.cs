@@ -12,8 +12,10 @@ using MiniProgrammingLanguage.Core.Parser.Ast.Enums;
 using MiniProgrammingLanguage.ExiledKit.Enums.Exiled;
 using MiniProgrammingLanguage.ExiledKit.Functions.Logger;
 using MiniProgrammingLanguage.ExiledKit.Functions.System;
+using MiniProgrammingLanguage.ExiledKit.Functions.Unity;
 using MiniProgrammingLanguage.ExiledKit.Types.Exiled;
 using MiniProgrammingLanguage.ExiledKit.Types.System;
+using MiniProgrammingLanguage.ExiledKit.Types.Unity;
 
 namespace MiniProgrammingLanguage.ExiledKit;
 
@@ -53,7 +55,10 @@ public static class ExiledKitModule
         
         programContext.Types.Add(PluginType.Instance);
         programContext.Types.Add(ListenerType.Instance);
+        programContext.Types.Add(ComponentType.Instance);
 
+        programContext.Functions.Add(CreateComponentFunction.Instance);
+        programContext.Functions.Add(AddComponentFunction.Instance);
         programContext.Functions.Add(SpawnFunction.Instance);
         programContext.Functions.Add(LogFunction.Instance);
     }

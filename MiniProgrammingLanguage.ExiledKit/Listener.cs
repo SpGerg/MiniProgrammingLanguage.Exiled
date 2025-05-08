@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Exiled.API.Interfaces;
 using MiniProgrammingLanguage.Core;
@@ -6,6 +7,7 @@ using MiniProgrammingLanguage.Core.Interpreter.Repositories.Functions;
 using MiniProgrammingLanguage.Core.Interpreter.Repositories.Functions.Interfaces;
 using MiniProgrammingLanguage.Core.Interpreter.Values;
 using MiniProgrammingLanguage.Core.Parser.Ast;
+using MiniProgrammingLanguage.ExiledKit.Functions.Logger;
 
 namespace MiniProgrammingLanguage.ExiledKit;
 
@@ -36,13 +38,28 @@ public class Listener
         
         foreach (var listener in _listeners)
         {
-            listener.Value.Evaluate(new FunctionExecuteContext
+            try
             {
-                ProgramContext = listener.Key,
-                Arguments = arguments,
-                Root = root,
-                Location = location
-            });
+                listener.Value.Evaluate(new FunctionExecuteContext
+                {
+                    ProgramContext = listener.Key,
+                    Arguments = arguments,
+                    Root = root,
+                    Location = location
+                });
+            }
+            catch (Exception exception)
+            {
+                var logContext = new FunctionExecuteContext
+                {
+                    ProgramContext = listener.Key,
+                    Arguments = null,
+                    Root = root,
+                    Location = location
+                };
+
+                LogFunction.Log(new LanguageFunctionExecuteContext(logContext, new AbstractValue[] { new StringValue(exception.Message) }));
+            }
         }
     }
 }

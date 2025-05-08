@@ -42,16 +42,20 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="Components\CustomComponent.cs" />
         <Compile Include="Enums\Exiled\RoleTypeEnum.cs" />
         <Compile Include="ExiledKitModule.cs" />
         <Compile Include="Functions\Logger\LogFunction.cs" />
         <Compile Include="Functions\System\SpawnFunction.cs" />
+        <Compile Include="Functions\Unity\AddComponentFunction.cs" />
+        <Compile Include="Functions\Unity\CreateComponentFunction.cs" />
         <Compile Include="Listener.cs" />
         <Compile Include="PlayerListeners.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="Types\Exiled\PlayerType.cs" />
         <Compile Include="Types\Exiled\PluginType.cs" />
         <Compile Include="Types\System\ListenerType.cs" />
+        <Compile Include="Types\Unity\ComponentType.cs" />
         <Compile Include="Utilities\CompilerFeatureRequiredAttribute.cs" />
         <Compile Include="Utilities\IsExternalInit.cs" />
         <Compile Include="Utilities\RequiredMemberAttribute.cs" />

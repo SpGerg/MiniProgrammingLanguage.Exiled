@@ -21,12 +21,21 @@ public static class PlayerType
             .SetModule(ExiledKitModule.Name)
             .SetAccess(AccessType.Static | AccessType.ReadOnly)
             .AddMember(new TypeLanguageFunctionMemberInstanceBuilder()
+                .SetParent("ex_player")
+                .SetName("get_gameobject")
+                .SetAccess(AccessType.ReadOnly | AccessType.Static)
+                .SetBind(GetGameObject)
+                .SetReturn(new ObjectTypeValue("un_game_object", ValueType.CSharpObject))
+                .Build())
+            .AddMember(new TypeLanguageFunctionMemberInstanceBuilder()
+                .SetParent("ex_player")
                 .SetName("set_role")
                 .SetAccess(AccessType.Static)
                 .SetArguments(new FunctionArgument("role", new ObjectTypeValue(RoleTypeEnum.Instance.Name, ValueType.EnumMember)))
                 .SetBind(SetRole)
                 .Build())
             .AddMember(new TypeLanguageFunctionMemberInstanceBuilder()
+                .SetParent("ex_player")
                 .SetName("broadcast")
                 .SetAccess(AccessType.Static)
                 .SetArguments(new FunctionArgument("duration", ObjectTypeValue.RoundNumber),
@@ -42,6 +51,13 @@ public static class PlayerType
         type.ObjectTarget = player;
 
         return type;
+    }
+    
+    public static AbstractValue GetGameObject(TypeFunctionExecuteContext context)
+    {
+        var player = (Player) context.Type.ObjectTarget;
+
+        return new CSharpObjectValue("un_game_object", player.GameObject);
     }
     
     public static AbstractValue SetRole(TypeFunctionExecuteContext context)
