@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Exiled.API.Interfaces;
 using MiniProgrammingLanguage.Core;
 using MiniProgrammingLanguage.Core.Exceptions;
 using MiniProgrammingLanguage.Core.Interpreter;
@@ -18,14 +17,35 @@ public class Listener
 
     private readonly List<KeyValuePair<ProgramContext, IFunctionInstance>> _listeners = new();
 
+    //If we unsubscribe from listener in function who was subscribed, it will throw 'collection was modified' exception
+    private readonly List<int> _delete = new();
+
+    private bool _isInvoking;
+
     public void Subscribe(ProgramContext programContext, IFunctionInstance functionInstance)
     {
-        _listeners.Add(new KeyValuePair<ProgramContext, IFunctionInstance>(programContext, functionInstance));
+        var member = new KeyValuePair<ProgramContext, IFunctionInstance>(programContext, functionInstance);
+        
+        _listeners.Add(member);
     }
     
     public void Unsubscribe(IFunctionInstance functionInstance)
     {
-        _listeners.RemoveAt(_listeners.FindIndex(listener => listener.Value == functionInstance));
+        var index = _listeners.FindIndex(listener => listener.Value == functionInstance);
+
+        if (index < 0)
+        {
+            return;
+        }
+
+        if (_isInvoking)
+        {
+            _delete.Add(index);
+            
+            return;
+        }
+        
+        _listeners.RemoveAt(index);
     }
     
     public void Invoke(FunctionBodyExpression root, Location location, params AbstractValue[] values)
@@ -36,6 +56,8 @@ public class Listener
         {
             arguments[i] = new ValueExpression(values[i], location);
         }
+
+        _isInvoking = true;
         
         foreach (var listener in _listeners)
         {
@@ -58,5 +80,14 @@ public class Listener
                 LogFunction.Log(listener.Key, $"{exception} {location}");
             }
         }
+
+        _isInvoking = false;
+
+        foreach (var delete in _delete)
+        {
+            _listeners.RemoveAt(delete);
+        }
+        
+        _delete.Clear();
     }
 }

@@ -13,6 +13,7 @@ using MiniProgrammingLanguage.Core.Interpreter.Values;
 using MiniProgrammingLanguage.Core.Interpreter.Values.Type;
 using MiniProgrammingLanguage.Core.Lexer;
 using MiniProgrammingLanguage.Core.Parser;
+using MiniProgrammingLanguage.Core.Parser.Exceptions;
 using MiniProgrammingLanguage.ExiledKit;
 
 namespace MiniProgrammingLanguage.Exiled.Commands;
@@ -37,31 +38,27 @@ public sealed class Run : ICommand
 
         var executor = arguments.At(0);
         var source = File.ReadAllText(Path.Combine(Plugin.Instance.ScriptsPath, $"{executor}.mpl"));
-        
-        var lexer = new Lexer(source, executor, LexerConfiguration.Default);
-        var tokens = lexer.Tokenize();
 
-        var parser = new Parser(tokens, executor, new ParserConfiguration
-        {
-            LexerConfiguration = lexer.Configuration
-        });
-        var functionBodyExpression = parser.Parse();
-
+        ProgramContext programContext = null;
         AbstractValue result = null;
-
-        var programContext = new ProgramContext(executor);
-        
-        ExiledKitModule.Include(Plugin.Instance, programContext, Plugin.Instance.OnEnabledListener, Plugin.Instance.OnDisabledListener);
-
         AbstractLanguageException exception = null;
 
         try
         {
-            result = functionBodyExpression.Evaluate(programContext);
+            var lexer = new Lexer(source, executor, LexerConfiguration.Default);
+            var tokens = lexer.Tokenize();
 
-            while (programContext.Tasks.Entities.Any())
+            var parser = new Parser(tokens, executor, new ParserConfiguration
             {
-            }
+                LexerConfiguration = lexer.Configuration
+            });
+            var functionBodyExpression = parser.Parse();
+
+            programContext = new ProgramContext(executor);
+        
+            ExiledKitModule.Include(Plugin.Instance, programContext, Plugin.Instance.OnEnabledListener, Plugin.Instance.OnDisabledListener);
+            
+            result = functionBodyExpression.Evaluate(programContext);
 
             var plugin = programContext.Variables.Get(null, $"{executor}_plugin", executor, Location.Default);
 
