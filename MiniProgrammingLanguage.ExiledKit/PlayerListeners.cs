@@ -12,4 +12,8 @@ public static class PlayerListeners
     public static Listener LeftListener { get; } = new();
     
     public static TypeValue Left { get; } = ListenerType.CreateValue(LeftListener);
+    
+    public static Listener DiedListener { get; } = new();
+    
+    public static TypeValue Died { get; } = ListenerType.CreateValue(DiedListener);
 }

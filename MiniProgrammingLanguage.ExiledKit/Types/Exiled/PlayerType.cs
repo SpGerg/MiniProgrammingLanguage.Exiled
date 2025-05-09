@@ -27,6 +27,20 @@ public static class PlayerType
                 .SetAccess(AccessType.ReadOnly | AccessType.Static)
                 .SetGetBind(GetNickname)
                 .Build())
+            .AddMember(new TypeLanguageVariableMemberInstanceBuilder()
+                .SetParent("ex_player")
+                .SetName("rank")
+                .SetAccess(AccessType.ReadOnly | AccessType.Static)
+                .SetGetBind(GetRank)
+                .SetSetBind(SetRank)
+                .SetType(ObjectTypeValue.String)
+                .Build())
+            .AddMember(new TypeLanguageFunctionMemberInstanceBuilder()
+                .SetParent("ex_player")
+                .SetName("get_user_id")
+                .SetAccess(AccessType.ReadOnly | AccessType.Static)
+                .SetBind(GetUserId)
+                .Build())
             .AddMember(new TypeLanguageFunctionMemberInstanceBuilder()
                 .SetParent("ex_player")
                 .SetName("get_gameobject")
@@ -34,19 +48,13 @@ public static class PlayerType
                 .SetBind(GetGameObject)
                 .SetReturn(new ObjectTypeValue("un_game_object", ValueType.CSharpObject))
                 .Build())
-            .AddMember(new TypeLanguageFunctionMemberInstanceBuilder()
+            .AddMember(new TypeLanguageVariableMemberInstanceBuilder()
                 .SetParent("ex_player")
-                .SetName("get_role")
+                .SetName("role")
                 .SetAccess(AccessType.Static)
-                .SetBind(GetRole)
-                .SetReturn(new ObjectTypeValue(RoleTypeEnum.Instance.Name, ValueType.EnumMember))
-                .Build())
-            .AddMember(new TypeLanguageFunctionMemberInstanceBuilder()
-                .SetParent("ex_player")
-                .SetName("set_role")
-                .SetAccess(AccessType.Static)
-                .SetArguments(new FunctionArgument("role", new ObjectTypeValue(RoleTypeEnum.Instance.Name, ValueType.EnumMember)))
-                .SetBind(SetRole)
+                .SetGetBind(GetRole)
+                .SetSetBind(SetRole)
+                .SetType(new ObjectTypeValue(RoleTypeEnum.Instance.Name, ValueType.EnumMember))
                 .Build())
             .AddMember(new TypeLanguageFunctionMemberInstanceBuilder()
                 .SetParent("ex_player")
@@ -67,6 +75,27 @@ public static class PlayerType
         return type;
     }
     
+    public static AbstractValue GetRank(TypeMemberGetterContext context)
+    {
+        var player = (Player) context.Type.ObjectTarget;
+        
+        return new StringValue(player.RankName);
+    }
+    
+    public static void SetRank(TypeMemberSetterContext context)
+    {
+        var player = (Player) context.Type.ObjectTarget;
+
+        player.RankName = context.Value.AsString(context.ProgramContext, context.Location);
+    }
+    
+    public static AbstractValue GetUserId(TypeFunctionExecuteContext context)
+    {
+        var player = (Player) context.Type.ObjectTarget;
+
+        return new StringValue(player.UserId);
+    }
+    
     public static AbstractValue GetNickname(TypeMemberGetterContext context)
     {
         var player = (Player) context.Type.ObjectTarget;
@@ -81,7 +110,7 @@ public static class PlayerType
         return new CSharpObjectValue("un_game_object", player.GameObject);
     }
     
-    public static AbstractValue GetRole(TypeFunctionExecuteContext context)
+    public static AbstractValue GetRole(TypeMemberGetterContext context)
     {
         var player = (Player) context.Type.ObjectTarget;
 
@@ -91,17 +120,13 @@ public static class PlayerType
         return new EnumMemberValue(RoleTypeEnum.Instance, name, value);
     }
     
-    public static AbstractValue SetRole(TypeFunctionExecuteContext context)
+    public static void SetRole(TypeMemberSetterContext context)
     {
         var player = (Player) context.Type.ObjectTarget;
 
-        var roleArgument = context.Arguments[0];
-
-        var role = (RoleTypeId) roleArgument.Evaluate(context.ProgramContext).AsRoundNumber(context.ProgramContext, context.Location);
+        var role = (RoleTypeId) context.Value.AsRoundNumber(context.ProgramContext, context.Location);
 
         player.Role.Set(role);
-        
-        return VoidValue.Instance;
     }
 
     public static AbstractValue Broadcast(TypeFunctionExecuteContext context)

@@ -16,7 +16,7 @@ public static class LogFunction
     {
         return new LanguageFunctionInstanceBuilder()
             .SetName("log")
-            .SetArguments(new FunctionArgument("content", ObjectTypeValue.String))
+            .SetArguments(new FunctionArgument("content", ObjectTypeValue.String, NoneValue.Instance))
             .SetAccess(AccessType.Static | AccessType.ReadOnly)
             .SetBind(Log)
             .Build();
@@ -25,7 +25,7 @@ public static class LogFunction
     public static AbstractValue Log(LanguageFunctionExecuteContext context)
     {
         var content = context.Arguments[0];
-        Log(context.ProgramContext, content.AsString(context.ProgramContext, context.Location));
+        Log(context.ProgramContext, content is NoneValue ? NoneValue.Instance.ToString() : content.AsString(context.ProgramContext, context.Location));
         
         return VoidValue.Instance;
     }

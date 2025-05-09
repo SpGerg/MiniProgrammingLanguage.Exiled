@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Exiled.API.Features;
 using Exiled.API.Interfaces;
 using Exiled.Events.EventArgs.Player;
@@ -16,6 +17,7 @@ using MiniProgrammingLanguage.ExiledKit.Functions.Unity;
 using MiniProgrammingLanguage.ExiledKit.Types.Exiled;
 using MiniProgrammingLanguage.ExiledKit.Types.System;
 using MiniProgrammingLanguage.ExiledKit.Types.Unity;
+using Utils.NonAllocLINQ;
 
 namespace MiniProgrammingLanguage.ExiledKit;
 
@@ -31,6 +33,7 @@ public static class ExiledKitModule
     {
         Exiled.Events.Handlers.Player.Verified += InvokeOnVerified;
         Exiled.Events.Handlers.Player.Left += InvokeOnLeft;
+        Exiled.Events.Handlers.Player.Died += InvokeOnDied;
     }
     
     public static void Include(IPlugin<IConfig> plugin, ProgramContext programContext, Listener onEnabled, Listener onDisabled)
@@ -49,6 +52,7 @@ public static class ExiledKitModule
 
         AddEventListener(programContext, "on_verified", PlayerListeners.Verified);
         AddEventListener(programContext, "on_left", PlayerListeners.Left);
+        AddEventListener(programContext, "on_died", PlayerListeners.Died);
         
         programContext.Enums.Add(RoleTypeEnum.Instance);
         programContext.Variables.Add(RoleTypeEnum.VariableInstance);
@@ -81,6 +85,17 @@ public static class ExiledKitModule
         _players.Remove(player);
 
         PlayerListeners.LeftListener.Invoke(null, Location.Default, player);
+    }
+    
+    private static void InvokeOnDied(DiedEventArgs ev)
+    {
+        AbstractValue player = _players.FirstOrDefault(entity => entity.ObjectTarget == ev.Player);
+        AbstractValue attacker = _players.FirstOrDefault(entity => entity.ObjectTarget == ev.Attacker);
+
+        player ??= NoneValue.Instance;
+        attacker ??= NoneValue.Instance;
+
+        PlayerListeners.DiedListener.Invoke(null, Location.Default, player, attacker);
     }
 
     private static void AddEventListener(ProgramContext programContext, string name, AbstractValue listener)

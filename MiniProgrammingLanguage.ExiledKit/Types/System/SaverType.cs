@@ -36,12 +36,13 @@ public static class SaverType
                 .SetAccess(AccessType.Static | AccessType.ReadOnly)
                 .Build())
             .AddMember(new TypeLanguageFunctionMemberInstanceBuilder()
-                    .SetParent("saver")
-                    .SetName("set")
-                    .SetBind(Set)
-                    .SetArguments(new FunctionArgument("name", ObjectTypeValue.String), new FunctionArgument("value", ObjectTypeValue.Any))
-                    .SetAccess(AccessType.Static | AccessType.ReadOnly)
-                    .Build())
+                .SetParent("saver")
+                .SetName("set")
+                .SetBind(Set)
+                .SetArguments(new FunctionArgument("name", ObjectTypeValue.String),
+                    new FunctionArgument("value", ObjectTypeValue.Any))
+                .SetAccess(AccessType.Static | AccessType.ReadOnly)
+                .Build())
             .Build();
     }
 

@@ -18,6 +18,8 @@ public static class SerializableValueFactory
         {
             RoundNumberValue roundNumberValue => new SerializableRoundNumberValue(roundNumberValue.Value),
             NumberValue numberValue => new SerializableNumberValue(numberValue.Value),
+            StringValue stringValue => new SerializableStringValue(stringValue.Value),
+            BooleanValue booleanValue => new SerializableBooleanValue(booleanValue.Value),
             _ => new SerializableNoneValue()
         };
     }
