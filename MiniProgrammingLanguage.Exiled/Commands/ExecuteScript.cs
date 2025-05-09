@@ -21,7 +21,7 @@ public sealed class ExecuteScript : ICommand
 
     public string[] Aliases { get; } = Array.Empty<string>();
 
-    private const string RaExecutor = "RA admin";
+    private const string RaExecutor = "ra";
 
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {

@@ -55,7 +55,7 @@ public class Listener
             }
             catch (Exception exception)
             {
-                LogFunction.Log(listener.Key, $"{exception.Message} {location}");
+                LogFunction.Log(listener.Key, $"{exception} {location}");
             }
         }
     }

@@ -39,8 +39,8 @@ public static class ExiledKitModule
         
         programContext.Variables.Add(new UserVariableInstance
         {
-            Name = "plugin",
-            Module = "global",
+            Name = $"{programContext.ExecutorName}_plugin",
+            Module = programContext.ExecutorName,
             Access = AccessType.Static | AccessType.ReadOnly,
             Type = new ObjectTypeValue("ex_plugin", ValueType.Type),
             Value = pluginValue,
@@ -57,6 +57,7 @@ public static class ExiledKitModule
         programContext.Types.Add(ListenerType.Instance);
         programContext.Types.Add(ComponentType.Instance);
         programContext.Types.Add(SaverType.Instance);
+        programContext.Types.Add(ExceptionType.Instance);
 
         programContext.Functions.Add(CreateComponentFunction.Instance);
         programContext.Functions.Add(AddComponentFunction.Instance);

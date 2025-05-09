@@ -97,38 +97,31 @@ public static class SaverType
 
         var dataFilePath = Path.Combine(filePath, $"{context.ProgramContext.ExecutorName}.data");
 
-        try
+        using var fileLock =
+            new FileStream(dataFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
+
+        using var fileReader = new StreamReader(fileLock, Encoding.UTF8);
+        var data = fileReader.ReadToEnd();
+            
+        var json = string.IsNullOrEmpty(data)
+            ? new SaveDataSerializable()
+            : JsonConvert.DeserializeObject<SaveDataSerializable>(data);
+
+        var serialized = SerializableValueFactory.Serialize(value, context.Location);
+
+        if (json.Values.ContainsKey(name))
         {
-            using var fileLock =
-                new FileStream(dataFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
-
-            using var fileReader = new StreamReader(fileLock, Encoding.UTF8);
-            var data = fileReader.ReadToEnd();
-            
-            var json = string.IsNullOrEmpty(data)
-                ? new SaveDataSerializable()
-                : JsonConvert.DeserializeObject<SaveDataSerializable>(data);
-
-            var serialized = SerializableValueFactory.Serialize(value);
-
-            if (json.Values.ContainsKey(name))
-            {
-                json.Values[name] = serialized;
-            }
-            else
-            {
-                json.Values.Add(name, serialized);
-            }
-            
-            fileLock.SetLength(0);
-            
-            using var fileWriter = new StreamWriter(fileLock, Encoding.UTF8);
-            fileWriter.Write(JsonConvert.SerializeObject(json));
+            json.Values[name] = serialized;
         }
-        catch (Exception exception)
+        else
         {
-            LogFunction.Log(context.ProgramContext, exception.ToString());
+            json.Values.Add(name, serialized);
         }
+            
+        fileLock.SetLength(0);
+            
+        using var fileWriter = new StreamWriter(fileLock, Encoding.UTF8);
+        fileWriter.Write(JsonConvert.SerializeObject(json));
 
         return VoidValue.Instance;
     }

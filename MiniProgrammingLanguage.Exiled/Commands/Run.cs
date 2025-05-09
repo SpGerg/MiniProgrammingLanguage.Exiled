@@ -63,20 +63,20 @@ public sealed class Run : ICommand
             {
             }
 
-            var plugin = programContext.Variables.Get(null, "plugin", "global", Location.Default);
+            var plugin = programContext.Variables.Get(null, $"{executor}_plugin", executor, Location.Default);
 
             var getterContext = new VariableGetterContext
             {
                 ProgramContext = programContext,
                 Location = Location.Default
             };
-            
+
             var pluginType = (TypeValue) plugin.GetValue(getterContext);
-            
+
             var listenerMember = pluginType.Get(new KeyTypeMemberIdentification { Identifier = "on_enabled" });
-            var listenerType = (TypeValue) ((TypeMemberValue) listenerMember).Value;
+            var listenerType = (TypeValue) ((TypeMemberValue)listenerMember).Value;
             var listener = (Listener) listenerType.ObjectTarget;
-            
+
             listener.Invoke(null, Location.Default);
         }
         catch (AbstractLanguageException abstractLanguageException)
