@@ -1,5 +1,6 @@
 using System;
 using Discord;
+using MiniProgrammingLanguage.Core.Interpreter;
 using MiniProgrammingLanguage.Core.Interpreter.Repositories.Functions;
 using MiniProgrammingLanguage.Core.Interpreter.Values;
 using MiniProgrammingLanguage.Core.Parser;
@@ -24,10 +25,15 @@ public static class LogFunction
     public static AbstractValue Log(LanguageFunctionExecuteContext context)
     {
         var content = context.Arguments[0];
-        var message = $"[{context.ProgramContext.ExecutorName}] {content.AsString(context.ProgramContext, context.Location)}";
-        
-        Exiled.API.Features.Log.Send(message, LogLevel.Info, ConsoleColor.Cyan);
+        Log(context.ProgramContext, content.AsString(context.ProgramContext, context.Location));
         
         return VoidValue.Instance;
+    }
+    
+    public static void Log(ProgramContext programContext, string content)
+    {
+        var message = $"[{programContext.ExecutorName}] {content}";
+        
+        Exiled.API.Features.Log.Send(message, LogLevel.Info, ConsoleColor.Cyan);
     }
 }

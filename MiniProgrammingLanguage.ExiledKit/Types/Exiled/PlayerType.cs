@@ -2,6 +2,7 @@ using Exiled.API.Features;
 using MiniProgrammingLanguage.Core.Interpreter.Repositories.Types;
 using MiniProgrammingLanguage.Core.Interpreter.Values;
 using MiniProgrammingLanguage.Core.Interpreter.Values.Enums;
+using MiniProgrammingLanguage.Core.Interpreter.Values.EnumsValues;
 using MiniProgrammingLanguage.Core.Interpreter.Values.Type;
 using MiniProgrammingLanguage.Core.Parser;
 using MiniProgrammingLanguage.Core.Parser.Ast.Enums;
@@ -20,12 +21,25 @@ public static class PlayerType
             .SetName("ex_player")
             .SetModule(ExiledKitModule.Name)
             .SetAccess(AccessType.Static | AccessType.ReadOnly)
+            .AddMember(new TypeLanguageVariableMemberInstanceBuilder()
+                .SetParent("ex_player")
+                .SetName("nickname")
+                .SetAccess(AccessType.ReadOnly | AccessType.Static)
+                .SetGetBind(GetNickname)
+                .Build())
             .AddMember(new TypeLanguageFunctionMemberInstanceBuilder()
                 .SetParent("ex_player")
                 .SetName("get_gameobject")
                 .SetAccess(AccessType.ReadOnly | AccessType.Static)
                 .SetBind(GetGameObject)
                 .SetReturn(new ObjectTypeValue("un_game_object", ValueType.CSharpObject))
+                .Build())
+            .AddMember(new TypeLanguageFunctionMemberInstanceBuilder()
+                .SetParent("ex_player")
+                .SetName("get_role")
+                .SetAccess(AccessType.Static)
+                .SetBind(GetRole)
+                .SetReturn(new ObjectTypeValue(RoleTypeEnum.Instance.Name, ValueType.EnumMember))
                 .Build())
             .AddMember(new TypeLanguageFunctionMemberInstanceBuilder()
                 .SetParent("ex_player")
@@ -53,11 +67,28 @@ public static class PlayerType
         return type;
     }
     
+    public static AbstractValue GetNickname(TypeMemberGetterContext context)
+    {
+        var player = (Player) context.Type.ObjectTarget;
+
+        return new StringValue(player.Nickname);
+    }
+    
     public static AbstractValue GetGameObject(TypeFunctionExecuteContext context)
     {
         var player = (Player) context.Type.ObjectTarget;
 
         return new CSharpObjectValue("un_game_object", player.GameObject);
+    }
+    
+    public static AbstractValue GetRole(TypeFunctionExecuteContext context)
+    {
+        var player = (Player) context.Type.ObjectTarget;
+
+        var value = (int) player.Role.Type;
+        var name = RoleTypeEnum.Instance.GetByValue(value);
+
+        return new EnumMemberValue(RoleTypeEnum.Instance, name, value);
     }
     
     public static AbstractValue SetRole(TypeFunctionExecuteContext context)

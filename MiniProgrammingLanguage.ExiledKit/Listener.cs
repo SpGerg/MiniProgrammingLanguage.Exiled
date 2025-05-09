@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Exiled.API.Interfaces;
 using MiniProgrammingLanguage.Core;
+using MiniProgrammingLanguage.Core.Exceptions;
 using MiniProgrammingLanguage.Core.Interpreter;
 using MiniProgrammingLanguage.Core.Interpreter.Repositories.Functions;
 using MiniProgrammingLanguage.Core.Interpreter.Repositories.Functions.Interfaces;
@@ -48,17 +49,13 @@ public class Listener
                     Location = location
                 });
             }
+            catch (AbstractLanguageException abstractLanguageException)
+            {
+                LogFunction.Log(listener.Key, abstractLanguageException.Message);
+            }
             catch (Exception exception)
             {
-                var logContext = new FunctionExecuteContext
-                {
-                    ProgramContext = listener.Key,
-                    Arguments = null,
-                    Root = root,
-                    Location = location
-                };
-
-                LogFunction.Log(new LanguageFunctionExecuteContext(logContext, new AbstractValue[] { new StringValue(exception.Message) }));
+                LogFunction.Log(listener.Key, $"{exception.Message} {location}");
             }
         }
     }

@@ -26,6 +26,7 @@ public static class RoleTypeEnum
             .SetName("role_type")
             .SetModule(ExiledKitModule.Name)
             .SetAccess(AccessType.Static | AccessType.ReadOnly)
+            .AddMember("none", -1)
             .AddMember("scp_173", 0)
             .AddMember("class_d", 1)
             .AddMember("spectator", 2)

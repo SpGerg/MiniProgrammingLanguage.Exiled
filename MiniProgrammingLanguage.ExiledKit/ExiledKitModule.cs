@@ -56,6 +56,7 @@ public static class ExiledKitModule
         programContext.Types.Add(PluginType.Instance);
         programContext.Types.Add(ListenerType.Instance);
         programContext.Types.Add(ComponentType.Instance);
+        programContext.Types.Add(SaverType.Instance);
 
         programContext.Functions.Add(CreateComponentFunction.Instance);
         programContext.Functions.Add(AddComponentFunction.Instance);

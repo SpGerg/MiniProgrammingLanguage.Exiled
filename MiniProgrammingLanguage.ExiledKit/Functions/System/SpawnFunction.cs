@@ -52,15 +52,7 @@ public static class SpawnFunction
             }
             catch (Exception exception)
             {
-                var logContext = new FunctionExecuteContext
-                {
-                    ProgramContext = context.ProgramContext,
-                    Arguments = null,
-                    Root = context.Root,
-                    Location = context.Location
-                };
-
-                LogFunction.Log(new LanguageFunctionExecuteContext(logContext, new AbstractValue[] { new StringValue(exception.Message) }));
+                LogFunction.Log(context.ProgramContext, exception.Message);
             }
         });
         
