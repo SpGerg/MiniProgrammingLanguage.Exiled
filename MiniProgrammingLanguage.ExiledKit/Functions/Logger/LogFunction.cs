@@ -25,7 +25,7 @@ public static class LogFunction
     public static AbstractValue Log(LanguageFunctionExecuteContext context)
     {
         var content = context.Arguments[0];
-        Log(context.ProgramContext, content is NoneValue ? NoneValue.Instance.ToString() : content.AsString(context.ProgramContext, context.Location));
+        Log(context.ProgramContext, content is NoneValue ? "none" : content.AsString(context.ProgramContext, context.Location));
         
         return VoidValue.Instance;
     }

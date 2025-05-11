@@ -38,8 +38,33 @@ public sealed class Run : ICommand
         }
 
         var executor = arguments.At(0);
-        var source = File.ReadAllText(Path.Combine(Plugin.Instance.ScriptsPath, $"{executor}.mpl"));
+        string source;
 
+        if (executor.EndsWith(".mpl"))
+        {
+            source = File.ReadAllText(Path.Combine(Plugin.Instance.ScriptsPath, executor));
+        }
+        else
+        {
+            var path = Path.Combine(Plugin.Instance.ScriptsPath, executor);
+
+            if (!Directory.Exists(path))
+            {
+                response = $"Project with {executor} name not found";
+                return false;
+            }
+
+            var root = Path.Combine(path, "root.mpl");
+            
+            if (!File.Exists(root))
+            {
+                response = $"Root file in project with {executor} name not found";
+                return false;
+            }
+            
+            source = File.ReadAllText(root);
+        }
+        
         ProgramContext programContext = null;
         AbstractValue result = null;
         AbstractLanguageException exception = null;
@@ -55,27 +80,12 @@ public sealed class Run : ICommand
             });
             var functionBodyExpression = parser.Parse();
 
-            programContext = new ProgramContext(executor);
+            programContext = new ProgramContext(executor.Replace(".mpl", string.Empty));
         
             ExiledKitModule.Include(Plugin.Instance, programContext, Plugin.Instance.OnEnabledListener, Plugin.Instance.OnDisabledListener);
             
             result = functionBodyExpression.Evaluate(programContext);
-
-            var plugin = programContext.Variables.Get(null, $"{executor}_plugin", executor, Location.Default);
-
-            var getterContext = new VariableGetterContext
-            {
-                ProgramContext = programContext,
-                Location = Location.Default
-            };
-
-            var pluginType = (TypeValue) plugin.GetValue(getterContext);
-
-            var listenerMember = pluginType.Get(new KeyTypeMemberIdentification { Identifier = "on_enabled" });
-            var listenerType = (TypeValue) ((TypeMemberValue)listenerMember).Value;
-            var listener = (Listener) listenerType.ObjectTarget;
-
-            listener.Invoke(null, Location.Default);
+            InvokeOnEnabled(programContext);
         }
         catch (AbstractLanguageException abstractLanguageException)
         {
@@ -90,5 +100,23 @@ public sealed class Run : ICommand
 
         response = $"Script executed. Result: {(result is VoidValue or NoneValue ? result : result.AsString(programContext, Location.Default))}";
         return true;
+    }
+
+    private static void InvokeOnEnabled(ProgramContext programContext)
+    {
+        var plugin = programContext.Variables.Get(null, $"{programContext.ExecutorName}_plugin", programContext.ExecutorName, Location.Default);
+        var getterContext = new VariableGetterContext
+        {
+            ProgramContext = programContext,
+            Location = Location.Default
+        };
+
+        var pluginType = (TypeValue) plugin.GetValue(getterContext);
+
+        var listenerMember = pluginType.Get(new KeyTypeMemberIdentification { Identifier = "on_enabled" });
+        var listenerType = (TypeValue) ((TypeMemberValue) listenerMember).Value;
+        var listener = (Listener) listenerType.ObjectTarget;
+
+        listener.Invoke(null, Location.Default);
     }
 }

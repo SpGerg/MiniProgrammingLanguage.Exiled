@@ -14,6 +14,7 @@ using MiniProgrammingLanguage.ExiledKit.Enums.Exiled;
 using MiniProgrammingLanguage.ExiledKit.Functions.Logger;
 using MiniProgrammingLanguage.ExiledKit.Functions.System;
 using MiniProgrammingLanguage.ExiledKit.Functions.Unity;
+using MiniProgrammingLanguage.ExiledKit.Interfaces;
 using MiniProgrammingLanguage.ExiledKit.Types.Exiled;
 using MiniProgrammingLanguage.ExiledKit.Types.System;
 using MiniProgrammingLanguage.ExiledKit.Types.Unity;
@@ -36,7 +37,7 @@ public static class ExiledKitModule
         Exiled.Events.Handlers.Player.Died += InvokeOnDied;
     }
     
-    public static void Include(IPlugin<IConfig> plugin, ProgramContext programContext, Listener onEnabled, Listener onDisabled)
+    public static void Include(IExiledKitPlugin<IConfig> plugin, ProgramContext programContext, Listener onEnabled, Listener onDisabled)
     {
         var pluginValue = PluginType.CreateValue(plugin, programContext.ExecutorName, onEnabled, onDisabled);
         
@@ -56,7 +57,7 @@ public static class ExiledKitModule
         
         programContext.Enums.Add(RoleTypeEnum.Instance);
         programContext.Variables.Add(RoleTypeEnum.VariableInstance);
-        
+
         programContext.Types.Add(PluginType.Instance);
         programContext.Types.Add(ListenerType.Instance);
         programContext.Types.Add(ComponentType.Instance);
@@ -67,6 +68,9 @@ public static class ExiledKitModule
         programContext.Functions.Add(AddComponentFunction.Instance);
         programContext.Functions.Add(SpawnFunction.Instance);
         programContext.Functions.Add(LogFunction.Instance);
+        programContext.Functions.Add(GetDataDirectoryFunction.Instance);
+        programContext.Functions.Add(GetConfigFunction.Instance);
+        programContext.Functions.Add(LoadConfigFunction.Instance);
     }
 
     private static void InvokeOnVerified(VerifiedEventArgs ev)

@@ -39,6 +39,9 @@
         <Reference Include="MiniProgrammingLanguage.Core">
           <HintPath>..\..\..\..\Desktop\MiniProgrammingLanguage.Core\MiniProgrammingLanguage.Core\bin\Debug\MiniProgrammingLanguage.Core.dll</HintPath>
         </Reference>
+        <Reference Include="MiniProgrammingLanguage.SharpKit">
+          <HintPath>..\..\..\..\Desktop\MiniProgrammingLanguage.Core\MiniProgrammingLanguage.Tests\bin\Debug\MiniProgrammingLanguage.SharpKit.dll</HintPath>
+        </Reference>
         <Reference Include="mscorlib" />
         <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
           <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -76,11 +79,16 @@
     <ItemGroup>
         <Compile Include="Components\CustomComponent.cs" />
         <Compile Include="Enums\Exiled\RoleTypeEnum.cs" />
+        <Compile Include="Exceptions\IncorrectYamlTypeException.cs" />
         <Compile Include="ExiledKitModule.cs" />
         <Compile Include="Functions\Logger\LogFunction.cs" />
+        <Compile Include="Functions\System\GetConfigFunction.cs" />
+        <Compile Include="Functions\System\GetDataDirectoryFunction.cs" />
+        <Compile Include="Functions\System\LoadConfigFunction.cs" />
         <Compile Include="Functions\System\SpawnFunction.cs" />
         <Compile Include="Functions\Unity\AddComponentFunction.cs" />
         <Compile Include="Functions\Unity\CreateComponentFunction.cs" />
+        <Compile Include="Interfaces\IExiledKitPlugin.cs" />
         <Compile Include="Listener.cs" />
         <Compile Include="PlayerListeners.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
