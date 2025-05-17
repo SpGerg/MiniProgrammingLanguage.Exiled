@@ -45,9 +45,11 @@
         <Compile Include="Commands\ExecuteScript.cs" />
         <Compile Include="Commands\Parent.cs" />
         <Compile Include="Commands\Run.cs" />
+        <Compile Include="Commands\Stop.cs" />
         <Compile Include="Config.cs" />
         <Compile Include="Plugin.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
+        <Compile Include="Script.cs" />
         <Compile Include="Utilities\CompilerFeatureRequiredAttribute.cs" />
         <Compile Include="Utilities\IsExternalInit.cs" />
         <Compile Include="Utilities\RequiredMemberAttribute.cs" />

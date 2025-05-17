@@ -64,59 +64,16 @@ public sealed class Run : ICommand
             
             source = File.ReadAllText(root);
         }
-        
-        ProgramContext programContext = null;
-        AbstractValue result = null;
-        AbstractLanguageException exception = null;
 
-        try
-        {
-            var lexer = new Lexer(source, executor, LexerConfiguration.Default);
-            var tokens = lexer.Tokenize();
-
-            var parser = new Parser(tokens, executor, new ParserConfiguration
-            {
-                LexerConfiguration = lexer.Configuration
-            });
-            var functionBodyExpression = parser.Parse();
-
-            programContext = new ProgramContext(executor.Replace(".mpl", string.Empty));
-        
-            ExiledKitModule.Include(Plugin.Instance, programContext, Plugin.Instance.OnEnabledListener, Plugin.Instance.OnDisabledListener);
-            
-            result = functionBodyExpression.Evaluate(programContext);
-            InvokeOnEnabled(programContext);
-        }
-        catch (AbstractLanguageException abstractLanguageException)
-        {
-            exception = abstractLanguageException;
-        }
+        var result = Script.Run(source, executor, out var programContext, out var exception);
 
         if (exception is not null)
         {
-            response = exception.Message;
-            return false;
+            response = $"Script execution error: {exception.Message}";
+            return true;
         }
 
         response = $"Script executed. Result: {(result is VoidValue or NoneValue ? result : result.AsString(programContext, Location.Default))}";
         return true;
-    }
-
-    private static void InvokeOnEnabled(ProgramContext programContext)
-    {
-        var plugin = programContext.Variables.Get(null, $"{programContext.ExecutorName}_plugin", programContext.ExecutorName, Location.Default);
-        var getterContext = new VariableGetterContext
-        {
-            ProgramContext = programContext,
-            Location = Location.Default
-        };
-
-        var pluginType = (TypeValue) plugin.GetValue(getterContext);
-
-        var listenerMember = pluginType.Get(new KeyTypeMemberIdentification { Identifier = "on_enabled" });
-        var listenerType = (TypeValue) ((TypeMemberValue) listenerMember).Value;
-        var listener = (Listener) listenerType.ObjectTarget;
-
-        listener.Invoke(null, Location.Default);
     }
 }

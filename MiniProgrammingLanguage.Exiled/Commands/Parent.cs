@@ -36,6 +36,7 @@ public sealed class Parent : ParentCommand
     {
         RegisterCommand(new ExecuteScript());
         RegisterCommand(new Run());
+        RegisterCommand(new Stop());
     }
 
     protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)
